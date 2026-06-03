@@ -18,6 +18,21 @@ class Empresa(models.Model):
     class Meta:
         db_table = "empresa"
 
+
+# modelo de documentos
+class Documento(models.Model):
+    id_documento = models.AutoField(primary_key=True)
+    tipo_documento = models.CharField(max_length=100)
+    activo = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)    
+    
+    def __str__(self):
+        return self.tipo_documento
+    
+    class Meta:
+        db_table = "documento"
+
 # Modelo de Conductores
 
 class Conductor(models.Model):
@@ -28,7 +43,8 @@ class Conductor(models.Model):
     )
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
-    documento = models.CharField(max_length=20)
+    numero_documento = models.CharField(max_length=200)
+    documento = models.ForeignKey(Documento, on_delete=models.CASCADE)
     telefono = models.CharField(max_length=20)
     licencia = models.CharField(max_length=50)
     activo = models.BooleanField(default=True)
@@ -114,19 +130,6 @@ class Ruta(models.Model):
     class Meta:
         db_table = "ruta"
 
-# modelo de documentos
-class Documento(models.Model):
-    id_documento = models.AutoField(primary_key=True)
-    tipo_documento = models.CharField(max_length=100)
-    activo = models.BooleanField(default=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_modificacion = models.DateTimeField(auto_now=True)    
-    
-    def __str__(self):
-        return self.tipo_documento
-    
-    class Meta:
-        db_table = "documento"
 
 
 # Modelo de Pasajeros
@@ -135,6 +138,7 @@ class Pasajero(models.Model):
     id_pasajero = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
+    numero_documento = models.CharField(max_length=200)
     documento = models.ForeignKey(Documento, on_delete=models.CASCADE)
     telefono = models.CharField(max_length=20)
     correo = models.EmailField(unique=True)
