@@ -14,5 +14,9 @@ router.register(r'boleto', BoletoViewSet)
 router.register(r'mantenimiento', MantenimientoViewSet)
 # Auditoría de registros
 router.register(r'auditoria-registro', AuditoriaRegistroViewSet)
+# Roles y permisos
+router.register(r'roles', RolViewSet)
+# Roles y permisos
+router.register(r'permisos', PermisoViewSet)
 
 urlpatterns = router.urls

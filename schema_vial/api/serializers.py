@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.models import Group, Permission
 from .models import *
 
 class EmpresaSerializer(serializers.ModelSerializer):
@@ -61,3 +62,31 @@ class AuditoriaRegistroSerializer(serializers.ModelSerializer):
             'datos_nuevos',
             'fecha',
         )
+
+# Roles y permisos
+class PermisoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = [
+            'id',
+            'name',
+            'codename',
+            'content_type',
+        ]
+
+
+# Roles y permisos
+class RolSerializer(serializers.ModelSerializer):
+    permissions = serializers.PrimaryKeyRelatedField(
+        queryset=Permission.objects.all(),
+        many=True,
+        required=False
+    )
+
+    class Meta:
+        model = Group
+        fields = [
+            'id',
+            'name',
+            'permissions',
+        ]

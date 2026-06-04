@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib.auth.models import Group, Permission
 from rest_framework import viewsets
 from .models import *
 from .serializers import *
@@ -184,4 +185,31 @@ class AuditoriaRegistroViewSet(BaseViewSet):
         'fecha',
         'modelo',
         'accion',
+    ]
+
+# Roles y permisos
+class RolViewSet(BaseViewSet):
+    queryset = Group.objects.all()
+    serializer_class = RolSerializer
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = [
+        'name',
+    ]
+    ordering_fields = [
+        'name',
+    ]
+
+# Roles y permisos
+class PermisoViewSet(BaseViewSet):
+    queryset = Permission.objects.all()
+    serializer_class = PermisoSerializer
+    http_method_names = ['get', 'head', 'options']
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = [
+        'codename',
+        'content_type',
+    ]
+    ordering_fields = [
+        'name',
+        'codename',
     ]
