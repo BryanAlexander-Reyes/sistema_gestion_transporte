@@ -6,6 +6,10 @@ class EmpresaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Empresa
         fields = '__all__'
+class DocumentoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Documento
+        fields = '__all__'
 class ConductorSerializer(serializers.ModelSerializer):
     # Relaciones anidadas (Nested Serializers)
     empresa_detalle = EmpresaSerializer(source='empresa', read_only=True)
@@ -34,10 +38,6 @@ class RutaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ruta
-        fields = '__all__'
-class DocumentoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Documento
         fields = '__all__'
 class PasajeroSerializer(serializers.ModelSerializer):
     # Relaciones anidadas (Nested Serializers)
