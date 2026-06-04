@@ -2,44 +2,45 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .models import *
 from .serializers import *
+from .baseviewset import BaseViewSet
 
 # ViewSets
-class EmpresaViewSet(viewsets.ModelViewSet):
+class EmpresaViewSet(BaseViewSet):
     queryset = Empresa.objects.all()
     serializer_class = EmpresaSerializer
 
-class ConductorViewSet(viewsets.ModelViewSet):
+class ConductorViewSet(BaseViewSet):
     queryset = Conductor.objects.all()
     serializer_class = ConductorSerializer
 
-class VehiculoViewSet(viewsets.ModelViewSet):
+class VehiculoViewSet(BaseViewSet):
     queryset = Vehiculo.objects.all()
     serializer_class = VehiculoSerializer
 
-class EstacionViewSet(viewsets.ModelViewSet):
+class EstacionViewSet(BaseViewSet):
     queryset = Estacion.objects.all()
     serializer_class = EstacionSerializer
 
-class RutaViewSet(viewsets.ModelViewSet):
+class RutaViewSet(BaseViewSet):
     queryset = Ruta.objects.all()
     serializer_class = RutaSerializer
 
-class DocumentoViewSet(viewsets.ModelViewSet):
+class DocumentoViewSet(BaseViewSet):
     queryset = Documento.objects.all()
     serializer_class = DocumentoSerializer
 
-class PasajeroViewSet(viewsets.ModelViewSet):
+class PasajeroViewSet(BaseViewSet):
     queryset = Pasajero.objects.all()
     serializer_class = PasajeroSerializer
 
-class ViajeViewSet(viewsets.ModelViewSet):
+class ViajeViewSet(BaseViewSet):
     queryset = Viaje.objects.all()
     serializer_class = ViajeSerializer
 
-class BoletoViewSet(viewsets.ModelViewSet):
+class BoletoViewSet(BaseViewSet):
     queryset = Boleto.objects.all()
     serializer_class = BoletoSerializer
 
-class MantenimientoViewSet(viewsets.ModelViewSet):
+class MantenimientoViewSet(BaseViewSet):
     queryset = Mantenimiento.objects.all()
     serializer_class = MantenimientoSerializer
