@@ -1,8 +1,10 @@
 import logging
+from html import escape
 from datetime import date, datetime
 from decimal import Decimal
 
 from django.db import models
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework import viewsets
@@ -107,6 +109,52 @@ class BaseViewSet(viewsets.ModelViewSet):
             },
             status=status_code
         )
+
+    # Exportación de información (Excel)
+    def clean_excel_value(self, value):
+        if value is None:
+            return ""
+
+        if isinstance(value, models.Model):
+            value = str(value)
+        elif isinstance(value, Decimal):
+            value = str(value)
+        elif isinstance(value, (datetime, date)):
+            value = value.isoformat()
+
+        return str(value).replace("\r", " ").replace("\n", " ")
+
+    # Exportación de información (Excel)
+    @action(detail=False, methods=["get"], url_path="exportar-excel")
+    def export_excel(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        model = queryset.model
+        fields = model._meta.fields
+        filename = f"{model._meta.model_name}.xls"
+
+        response = HttpResponse(content_type="application/vnd.ms-excel; charset=utf-8")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        response.write("\ufeff")
+        response.write("<table><thead><tr>")
+
+        for field in fields:
+            response.write(f"<th>{escape(field.verbose_name)}</th>")
+
+        response.write("</tr></thead><tbody>")
+
+        for item in queryset:
+            response.write("<tr>")
+
+            for field in fields:
+                value = self.clean_excel_value(getattr(item, field.name))
+                response.write(f"<td>{escape(value)}</td>")
+
+            response.write("</tr>")
+
+        response.write("</tbody></table>")
+        self.log_operation("EXPORT_EXCEL", extra={"total": queryset.count()})
+
+        return response
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
