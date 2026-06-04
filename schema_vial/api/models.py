@@ -1,16 +1,12 @@
 from django.db import models
-
-from django.db import models
+from .base_models import SoftDeleteModel
 
 # modelo de empresa
-class Empresa(models.Model):
+class Empresa(SoftDeleteModel):
     id_empresa = models.AutoField(primary_key=True)
     nombre_empresa = models.CharField(max_length=100)
     descripcion = models.TextField()
     direccion = models.CharField(max_length=40)
-    activo = models.BooleanField(default=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_modificacion = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.nombre_empresa
@@ -20,12 +16,9 @@ class Empresa(models.Model):
 
 
 # modelo de documentos
-class Documento(models.Model):
+class Documento(SoftDeleteModel):
     id_documento = models.AutoField(primary_key=True)
     tipo_documento = models.CharField(max_length=100)
-    activo = models.BooleanField(default=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_modificacion = models.DateTimeField(auto_now=True)    
     
     def __str__(self):
         return self.tipo_documento
@@ -35,7 +28,7 @@ class Documento(models.Model):
 
 # Modelo de Conductores
 
-class Conductor(models.Model):
+class Conductor(SoftDeleteModel):
     id_conductor = models.AutoField(primary_key=True)
     empresa = models.ForeignKey(
         Empresa,
@@ -47,9 +40,6 @@ class Conductor(models.Model):
     documento = models.ForeignKey(Documento, on_delete=models.CASCADE)
     telefono = models.CharField(max_length=20)
     licencia = models.CharField(max_length=50)
-    activo = models.BooleanField(default=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_modificacion = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.nombre
@@ -60,16 +50,13 @@ class Conductor(models.Model):
 
 # Modelo de Vehículos
 
-class Vehiculo(models.Model):
+class Vehiculo(SoftDeleteModel):
     id_vehiculo = models.AutoField(primary_key=True)
     placa = models.CharField(max_length=10)
     marca = models.CharField(max_length=50)
     modelo = models.CharField(max_length=50)
     capacidad = models.IntegerField()
 
-    activo = models.BooleanField(default=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_modificacion = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.placa
@@ -80,7 +67,7 @@ class Vehiculo(models.Model):
 
 # Modelo de Estaciones
 
-class Estacion(models.Model):
+class Estacion(SoftDeleteModel):
     id_estacion = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     ciudad = models.CharField(max_length=100)
@@ -89,9 +76,6 @@ class Estacion(models.Model):
         Conductor,
         on_delete=models.CASCADE,
     )
-    activo = models.BooleanField(default=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_modificacion = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.nombre
@@ -102,7 +86,7 @@ class Estacion(models.Model):
 
 # Modelo de Rutas
 
-class Ruta(models.Model):
+class Ruta(SoftDeleteModel):
     id_ruta = models.AutoField(primary_key=True)
 
     origen = models.ForeignKey(
@@ -120,9 +104,6 @@ class Ruta(models.Model):
     nombre_ruta = models.CharField(max_length=100)
     distancia_km = models.DecimalField(max_digits=8, decimal_places=2)
 
-    activo = models.BooleanField(default=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_modificacion = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.nombre_ruta
@@ -134,7 +115,7 @@ class Ruta(models.Model):
 
 # Modelo de Pasajeros
 
-class Pasajero(models.Model):
+class Pasajero(SoftDeleteModel):
     id_pasajero = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
@@ -142,9 +123,6 @@ class Pasajero(models.Model):
     documento = models.ForeignKey(Documento, on_delete=models.CASCADE)
     telefono = models.CharField(max_length=20)
     correo = models.EmailField(unique=True)
-    activo = models.BooleanField(default=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_modificacion = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.nombre
@@ -155,7 +133,7 @@ class Pasajero(models.Model):
 
 # Modelo de Viajes
 
-class Viaje(models.Model):
+class Viaje(SoftDeleteModel):
     id_viaje = models.AutoField(primary_key=True)
 
     vehiculo = models.ForeignKey(
@@ -172,9 +150,6 @@ class Viaje(models.Model):
     )
     fecha_salida = models.DateTimeField()
     fecha_llegada = models.DateTimeField()
-    activo = models.BooleanField(default=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_modificacion = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Viaje {self.id_viaje}"
@@ -185,7 +160,7 @@ class Viaje(models.Model):
 
 # Modelo de Boletos
 
-class Boleto(models.Model):
+class Boleto(SoftDeleteModel):
     id_boleto = models.AutoField(primary_key=True)
     viaje = models.ForeignKey(
         Viaje,
@@ -198,9 +173,6 @@ class Boleto(models.Model):
     numero_asiento = models.IntegerField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_compra = models.DateTimeField(auto_now_add=True)
-    activo = models.BooleanField(default=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_modificacion = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Boleto {self.id_boleto}"
@@ -211,7 +183,7 @@ class Boleto(models.Model):
 
 # Modelo de Mantenimientos
 
-class Mantenimiento(models.Model):
+class Mantenimiento(SoftDeleteModel):
     id_mantenimiento = models.AutoField(primary_key=True)
     vehiculo = models.ForeignKey(
         Vehiculo,
@@ -221,9 +193,6 @@ class Mantenimiento(models.Model):
     fecha_mantenimiento = models.DateField()
     costo = models.DecimalField(max_digits=12, decimal_places=2)
 
-    activo = models.BooleanField(default=True)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_modificacion = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Mantenimiento {self.id_mantenimiento}"
