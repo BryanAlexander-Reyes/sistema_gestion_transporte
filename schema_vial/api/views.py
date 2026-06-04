@@ -23,7 +23,8 @@ class EmpresaViewSet(BaseViewSet):
     ]
 
 class ConductorViewSet(BaseViewSet):
-    queryset = Conductor.objects.all()
+    # Relaciones anidadas (Nested Serializers)
+    queryset = Conductor.objects.select_related('empresa', 'documento').all()
     serializer_class = ConductorSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = [
@@ -57,7 +58,12 @@ class VehiculoViewSet(BaseViewSet):
         'fecha_creacion',
     ]
 class EstacionViewSet(BaseViewSet):
-    queryset = Estacion.objects.all()
+    # Relaciones anidadas (Nested Serializers)
+    queryset = Estacion.objects.select_related(
+        'id_conductor',
+        'id_conductor__empresa',
+        'id_conductor__documento'
+    ).all()
     serializer_class = EstacionSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = [
@@ -73,7 +79,17 @@ class EstacionViewSet(BaseViewSet):
         'fecha_creacion',
     ]
 class RutaViewSet(BaseViewSet):
-    queryset = Ruta.objects.all()
+    # Relaciones anidadas (Nested Serializers)
+    queryset = Ruta.objects.select_related(
+        'origen',
+        'origen__id_conductor',
+        'origen__id_conductor__empresa',
+        'origen__id_conductor__documento',
+        'destino',
+        'destino__id_conductor',
+        'destino__id_conductor__empresa',
+        'destino__id_conductor__documento'
+    ).all()
     serializer_class = RutaSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = [
@@ -101,7 +117,8 @@ class DocumentoViewSet(BaseViewSet):
         'fecha_creacion',
     ]
 class PasajeroViewSet(BaseViewSet):
-    queryset = Pasajero.objects.all()
+    # Relaciones anidadas (Nested Serializers)
+    queryset = Pasajero.objects.select_related('documento').all()
     serializer_class = PasajeroSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = [
@@ -118,7 +135,22 @@ class PasajeroViewSet(BaseViewSet):
         'fecha_creacion',
     ]
 class ViajeViewSet(BaseViewSet):
-    queryset = Viaje.objects.all()
+    # Relaciones anidadas (Nested Serializers)
+    queryset = Viaje.objects.select_related(
+        'vehiculo',
+        'conductor',
+        'conductor__empresa',
+        'conductor__documento',
+        'ruta',
+        'ruta__origen',
+        'ruta__origen__id_conductor',
+        'ruta__origen__id_conductor__empresa',
+        'ruta__origen__id_conductor__documento',
+        'ruta__destino',
+        'ruta__destino__id_conductor',
+        'ruta__destino__id_conductor__empresa',
+        'ruta__destino__id_conductor__documento'
+    ).all()
     serializer_class = ViajeSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = [
@@ -135,7 +167,25 @@ class ViajeViewSet(BaseViewSet):
         'fecha_creacion',
     ]
 class BoletoViewSet(BaseViewSet):
-    queryset = Boleto.objects.all()
+    # Relaciones anidadas (Nested Serializers)
+    queryset = Boleto.objects.select_related(
+        'viaje',
+        'viaje__vehiculo',
+        'viaje__conductor',
+        'viaje__conductor__empresa',
+        'viaje__conductor__documento',
+        'viaje__ruta',
+        'viaje__ruta__origen',
+        'viaje__ruta__origen__id_conductor',
+        'viaje__ruta__origen__id_conductor__empresa',
+        'viaje__ruta__origen__id_conductor__documento',
+        'viaje__ruta__destino',
+        'viaje__ruta__destino__id_conductor',
+        'viaje__ruta__destino__id_conductor__empresa',
+        'viaje__ruta__destino__id_conductor__documento',
+        'pasajero',
+        'pasajero__documento'
+    ).all()
     serializer_class = BoletoSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = [
@@ -154,7 +204,8 @@ class BoletoViewSet(BaseViewSet):
         'fecha_creacion',
     ]
 class MantenimientoViewSet(BaseViewSet):
-    queryset = Mantenimiento.objects.all()
+    # Relaciones anidadas (Nested Serializers)
+    queryset = Mantenimiento.objects.select_related('vehiculo').all()
     serializer_class = MantenimientoSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = [
