@@ -121,9 +121,15 @@ USE_I18N = True
 USE_TZ = True
 
 REST_FRAMEWORK = {
+
     'DEFAULT_VERSIONING_CLASS':
         'rest_framework.versioning.URLPathVersioning',
-    'DEFAULT_PAGINATION_CLASS':'api.pagination.DefaultPageNumberPagination',
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    'DEFAULT_PAGINATION_CLASS':
+        'api.pagination.DefaultPageNumberPagination',
     'PAGE_SIZE': 10,
 }
 # Static files (CSS, JavaScript, Images)
