@@ -12,5 +12,7 @@ router.register(r'pasajero', PasajeroViewSet)
 router.register(r'viaje', ViajeViewSet)
 router.register(r'boleto', BoletoViewSet)
 router.register(r'mantenimiento', MantenimientoViewSet)
+# Auditoría de registros
+router.register(r'auditoria-registro', AuditoriaRegistroViewSet)
 
 urlpatterns = router.urls

@@ -41,3 +41,23 @@ class MantenimientoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mantenimiento
         fields = '__all__'
+
+# Auditoría de registros
+class AuditoriaRegistroSerializer(serializers.ModelSerializer):
+    usuario_nombre = serializers.CharField(source='usuario.username', read_only=True)
+
+    class Meta:
+        model = AuditoriaRegistro
+        fields = '__all__'
+        read_only_fields = (
+            'id_auditoria',
+            'modelo',
+            'registro_id',
+            'accion',
+            'usuario',
+            'metodo',
+            'ruta',
+            'datos_anteriores',
+            'datos_nuevos',
+            'fecha',
+        )

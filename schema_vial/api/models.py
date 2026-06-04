@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from .base_models import SoftDeleteModel
 
 # modelo de empresa
@@ -199,3 +200,29 @@ class Mantenimiento(SoftDeleteModel):
 
     class Meta:
         db_table = "mantenimiento"
+
+
+# Auditoría de registros
+class AuditoriaRegistro(models.Model):
+    id_auditoria = models.AutoField(primary_key=True)
+    modelo = models.CharField(max_length=100)
+    registro_id = models.CharField(max_length=100, blank=True, null=True)
+    accion = models.CharField(max_length=50)
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
+    metodo = models.CharField(max_length=10)
+    ruta = models.CharField(max_length=255)
+    datos_anteriores = models.JSONField(blank=True, null=True)
+    datos_nuevos = models.JSONField(blank=True, null=True)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.accion} {self.modelo} {self.registro_id}"
+
+    class Meta:
+        db_table = "auditoria_registro"
+        ordering = ["-fecha"]

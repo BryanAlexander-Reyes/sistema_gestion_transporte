@@ -165,3 +165,23 @@ class MantenimientoViewSet(BaseViewSet):
         'activo',
         'fecha_creacion',
     ]
+
+# Auditoría de registros
+class AuditoriaRegistroViewSet(BaseViewSet):
+    queryset = AuditoriaRegistro.objects.all()
+    serializer_class = AuditoriaRegistroSerializer
+    http_method_names = ['get', 'head', 'options']
+    audit_enabled = False
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = [
+        'modelo',
+        'registro_id',
+        'accion',
+        'usuario',
+        'metodo',
+    ]
+    ordering_fields = [
+        'fecha',
+        'modelo',
+        'accion',
+    ]

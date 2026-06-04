@@ -1,15 +1,22 @@
 import logging
+from datetime import date, datetime
+from decimal import Decimal
 
+from django.db import models
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from .models import AuditoriaRegistro
 
 logger = logging.getLogger("api.operaciones")
 
 
 class BaseViewSet(viewsets.ModelViewSet):
+    # Auditoría de registros
+    audit_enabled = True
+
     def get_queryset(self):
         queryset = super().get_queryset()
 
@@ -37,6 +44,42 @@ class BaseViewSet(viewsets.ModelViewSet):
             self.request.method,
             self.request.get_full_path(),
             extra or {},
+        )
+
+    # Auditoría de registros
+    def serialize_audit_data(self, instance):
+        data = {}
+
+        for field in instance._meta.fields:
+            value = getattr(instance, field.name)
+
+            if isinstance(value, models.Model):
+                value = value.pk
+            elif isinstance(value, Decimal):
+                value = str(value)
+            elif isinstance(value, (datetime, date)):
+                value = value.isoformat()
+
+            data[field.name] = value
+
+        return data
+
+    # Auditoría de registros
+    def save_audit_record(self, action, instance=None, previous_data=None, new_data=None):
+        if not self.audit_enabled:
+            return
+
+        user = getattr(self.request, "user", None)
+
+        AuditoriaRegistro.objects.create(
+            modelo=self.get_queryset().model.__name__,
+            registro_id=str(getattr(instance, "pk", "")) if instance else None,
+            accion=action,
+            usuario=user if user and user.is_authenticated else None,
+            metodo=self.request.method,
+            ruta=self.request.get_full_path(),
+            datos_anteriores=previous_data,
+            datos_nuevos=new_data,
         )
 
     def success_response(self, message, data=None, status_code=status.HTTP_200_OK):
@@ -96,6 +139,12 @@ class BaseViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             instance = serializer.save()
             self.log_operation("CREATE", instance)
+            # Auditoría de registros
+            self.save_audit_record(
+                "CREATE",
+                instance,
+                new_data=self.serialize_audit_data(instance)
+            )
 
             return self.success_response(
                 "Registro creado correctamente",
@@ -111,6 +160,8 @@ class BaseViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
+        # Auditoría de registros
+        previous_data = self.serialize_audit_data(instance)
 
         serializer = self.get_serializer(
             instance,
@@ -121,6 +172,13 @@ class BaseViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             instance = serializer.save()
             self.log_operation("UPDATE", instance)
+            # Auditoría de registros
+            self.save_audit_record(
+                "UPDATE",
+                instance,
+                previous_data=previous_data,
+                new_data=self.serialize_audit_data(instance)
+            )
 
             return self.success_response(
                 "Registro actualizado correctamente",
@@ -134,13 +192,28 @@ class BaseViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        # Auditoría de registros
+        previous_data = self.serialize_audit_data(instance)
 
         if hasattr(instance, "soft_delete"):
             instance.soft_delete()
             self.log_operation("SOFT_DELETE", instance)
+            # Auditoría de registros
+            self.save_audit_record(
+                "SOFT_DELETE",
+                instance,
+                previous_data=previous_data,
+                new_data=self.serialize_audit_data(instance)
+            )
         else:
             instance.delete()
             self.log_operation("DELETE", instance)
+            # Auditoría de registros
+            self.save_audit_record(
+                "DELETE",
+                instance,
+                previous_data=previous_data
+            )
 
         return self.success_response(
             "Registro eliminado correctamente"
@@ -163,9 +236,18 @@ class BaseViewSet(viewsets.ModelViewSet):
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
 
+        # Auditoría de registros
+        previous_data = self.serialize_audit_data(instance)
         instance.restore()
         serializer = self.get_serializer(instance)
         self.log_operation("RESTORE", instance)
+        # Auditoría de registros
+        self.save_audit_record(
+            "RESTORE",
+            instance,
+            previous_data=previous_data,
+            new_data=self.serialize_audit_data(instance)
+        )
 
         return self.success_response(
             "Registro restaurado correctamente",
