@@ -123,6 +123,8 @@ USE_TZ = True
 REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS':
         'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_PAGINATION_CLASS':'api.pagination.DefaultPageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
